@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket Test</title>
+</head>
+
+<body>
+
+<h1>Socket.IO Test</h1>
+
+<script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+
+<script>
+
+const socket = io("http://localhost:5000");
+
+
+socket.on("connect",()=>{
+
+    console.log(
+        "Connected:",
+        socket.id
+    );
+
+});
+
+
+socket.on("newAnnouncement",(data)=>{
+
+    console.log(
+        "New announcement:",
+        data
+    );
+
+});
+
+socket.on("updatedAnnouncement",(data)=>{
+    console.log("Updated announcement:", data);
+});
+
+
+socket.on("deletedAnnouncement",(data)=>{
+    console.log("Deleted announcement:", data);
+});
+</script>
+
+</body>
+</html>
