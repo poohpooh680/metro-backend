@@ -1,45 +1,49 @@
-# Metro Backend API
+# MetroSync Backend API
 
-A backend API system for managing metro stations and announcements.  
-The project provides user authentication, station management, announcements management, validation, error handling, and real-time updates using Socket.IO.
+A backend REST API system for managing metro stations and announcements.  
+The project provides user authentication, station management, announcement management, validation, error handling, testing, and real-time updates using Socket.IO.
 
----
+## Features
 
-# Features
-
-## Authentication
+### Authentication
 - User registration
 - User login
-- JWT authentication
+- JWT-based authentication
 - Protected routes
 
-## Stations
+### Stations Management
 - Create stations
 - Get all stations
-- Get station details
-- Update stations
+- Get station by ID
+- Update station information
 - Delete stations
 
-## Announcements
+### Announcements Management
 - Create announcements
 - Get all announcements
-- Get announcement details
+- Get announcement by ID
 - Update announcements
 - Delete announcements
+- Filter announcements by station, type, and date
 
-## Realtime Updates
-Using Socket.IO:
-- New announcement notifications
-- Updated announcement notifications
-- Deleted announcement notifications
+### Real-Time Updates
+- Socket.IO integration
+- Users can join station rooms
+- Real-time announcement notifications
+- Viewer presence tracking
 
-## Other Features
-- MongoDB database
-- Express.js REST API
-- Service layer architecture
+### Security & Validation
 - Request validation
-- Global error handling
-- Swagger API documentation
+- Password hashing with bcrypt
+- JWT authorization
+- Centralized error handling
+- CORS configuration
+
+### Testing
+- API endpoint tests using Jest and Supertest
+- Socket.IO tests
+- Authentication tests
+- Announcement CRUD tests
 
 ---
 
@@ -49,11 +53,12 @@ Using Socket.IO:
 - Express.js
 - MongoDB
 - Mongoose
+- Socket.IO
 - JWT
 - bcrypt
-- Socket.IO
-- Express Validator
-- Swagger
+- Jest
+- Supertest
+- Swagger API Documentation
 
 ---
 
@@ -63,53 +68,40 @@ Using Socket.IO:
 metro-backend
 │
 ├── src
-│   │
 │   ├── config
 │   │   └── db.js
 │   │
 │   ├── controllers
-│   │   ├── authController.js
-│   │   ├── stationController.js
-│   │   └── announcementController.js
-│   │
-│   ├── models
-│   │   ├── User.js
-│   │   ├── Station.js
-│   │   └── Announcement.js
-│   │
-│   ├── routes
-│   │   ├── authRoutes.js
-│   │   ├── stationRoutes.js
-│   │   └── announcementRoutes.js
-│   │
-│   ├── services
-│   │   ├── authService.js
-│   │   ├── stationService.js
-│   │   └── announcementService.js
 │   │
 │   ├── middleware
-│   │   ├── auth.js
-│   │   ├── validate.js
-│   │   └── errorHandler.js
+│   │
+│   ├── models
+│   │
+│   ├── routes
+│   │
+│   ├── services
 │   │
 │   ├── sockets
-│   │   └── socket.js
 │   │
 │   ├── validators
-│   │   ├── authValidator.js
-│   │   ├── stationValidator.js
-│   │   └── announcementValidator.js
 │   │
 │   └── app.js
 │
-└── server.js
+├── tests
+│   ├── app.test.js
+│   └── socket.test.js
+│
+├── server.js
+├── seed.js
+├── package.json
+└── README.md
 ```
 
 ---
 
 # Installation
 
-Clone the project:
+Clone the repository:
 
 ```bash
 git clone <repository-url>
@@ -131,24 +123,30 @@ npm install
 
 # Environment Variables
 
-Create a `.env` file in the root folder:
+Create a `.env` file in the root directory:
 
-```
+```env
 PORT=5000
 
 MONGO_URI=your_mongodb_connection_string
 
-JWT_SECRET=your_secret_key
+JWT_SECRET=your_jwt_secret
 ```
 
 ---
 
-# Run The Project
+# Running the Project
 
-Development mode:
+## Development Mode
 
 ```bash
 npm run dev
+```
+
+## Production Mode
+
+```bash
+npm start
 ```
 
 The server will run on:
@@ -161,10 +159,28 @@ http://localhost:5000
 
 # API Documentation
 
-Swagger documentation:
+Swagger documentation is available at:
 
 ```
 http://localhost:5000/api-docs
+```
+
+---
+
+# Health Check
+
+Endpoint:
+
+```
+GET /health
+```
+
+Response:
+
+```json
+{
+  "status": "ok"
+}
 ```
 
 ---
@@ -176,195 +192,132 @@ http://localhost:5000/api-docs
 ### Register
 
 ```
-POST /api/auth/register
+POST /api/v1/auth/register
 ```
-
-Body:
-
-```json
-{
-    "name":"User",
-    "email":"user@test.com",
-    "password":"123456"
-}
-```
-
 
 ### Login
 
 ```
-POST /api/auth/login
-```
-
-Body:
-
-```json
-{
-    "email":"user@test.com",
-    "password":"123456"
-}
+POST /api/v1/auth/login
 ```
 
 ---
 
-# Stations
-
-### Create Station
-
-```
-POST /api/stations
-```
-
-Body:
-
-```json
-{
-    "name":"Main Station",
-    "location":"Cairo",
-    "line":"Line 1"
-}
-```
-
+## Stations
 
 ### Get Stations
 
 ```
-GET /api/stations
+GET /api/v1/stations
+```
+
+### Get Station
+
+```
+GET /api/v1/stations/:id
+```
+
+### Create Station
+
+```
+POST /api/v1/stations
+```
+
+### Update Station
+
+```
+PUT /api/v1/stations/:id
+```
+
+### Delete Station
+
+```
+DELETE /api/v1/stations/:id
 ```
 
 ---
 
-# Announcements
+## Announcements
 
 ### Get Announcements
 
 ```
-GET /api/announcements
+GET /api/v1/announcements
 ```
 
+### Get Announcement
+
+```
+GET /api/v1/announcements/:id
+```
 
 ### Create Announcement
 
-Protected route:
-
 ```
-POST /api/announcements
+POST /api/v1/announcements
 ```
-
-Headers:
-
-```
-Authorization: Bearer TOKEN
-```
-
-Body:
-
-```json
-{
-    "title":"Metro Delay",
-    "message":"Train delayed 10 minutes",
-    "station":"station_id"
-}
-```
-
 
 ### Update Announcement
 
-Protected route:
-
 ```
-PUT /api/announcements/:id
+PUT /api/v1/announcements/:id
 ```
-
 
 ### Delete Announcement
 
-Protected route:
-
 ```
-DELETE /api/announcements/:id
+DELETE /api/v1/announcements/:id
 ```
 
 ---
 
-# Socket.IO Events
+# Running Tests
 
-Client connection:
+Run all tests:
 
-```javascript
-const socket = io("http://localhost:5000");
+```bash
+npm test
 ```
 
+Current test coverage includes:
+
+- Authentication
+- Station endpoints
+- Announcement CRUD operations
+- Authorization checks
+- Socket.IO connections
+- Real-time events
+
+---
+
+# Real-Time Socket Events
+
+## Join Station Room
+
+Client emits:
+
+```javascript
+socket.emit("joinStation", stationId);
+```
 
 ## New Announcement
 
-Event:
+Server emits:
 
-```
+```javascript
 newAnnouncement
 ```
 
+## Viewer Updates
 
-Example:
+Server emits:
 
 ```javascript
-socket.on("newAnnouncement",(data)=>{
-    console.log(data);
-});
-```
-
-
-## Updated Announcement
-
-Event:
-
-```
-updatedAnnouncement
-```
-
-
-## Deleted Announcement
-
-Event:
-
-```
-deletedAnnouncement
-```
-
----
-
-# Error Handling
-
-The API returns JSON errors:
-
-Example:
-
-```json
-{
-    "message":"Error message"
-}
-```
-
----
-
-# Validation
-
-The API validates incoming requests and returns validation errors:
-
-Example:
-
-```json
-{
-    "errors":[
-        {
-            "msg":"Field is required"
-        }
-    ]
-}
+presenceUpdate
 ```
 
 ---
 
 # Author
 
-Metro Backend Project
+MetroSync Backend Team
