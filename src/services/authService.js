@@ -1,10 +1,15 @@
 const User = require("../models/User");
+
 const bcrypt = require("bcrypt");
+
 const jwt = require("jsonwebtoken");
 
 
+
 // Register user
+
 exports.registerUser = async (data) => {
+
 
     const {
         name,
@@ -13,15 +18,20 @@ exports.registerUser = async (data) => {
     } = data;
 
 
+
     const existingUser =
         await User.findOne({ email });
 
 
+
     if(existingUser){
 
-        throw new Error("User already exists");
+        throw new Error(
+            "User already exists"
+        );
 
     }
+
 
 
     const hashedPassword =
@@ -36,7 +46,9 @@ exports.registerUser = async (data) => {
 
             email,
 
-            password: hashedPassword
+            password: hashedPassword,
+
+            role:"admin"
 
         });
 
@@ -46,21 +58,31 @@ exports.registerUser = async (data) => {
         jwt.sign(
 
             {
-                id:user._id
+
+                id:user._id,
+
+                role:user.role
+
             },
 
             process.env.JWT_SECRET,
 
             {
+
                 expiresIn:"7d"
+
             }
 
         );
 
 
+
     return {
+
         user,
+
         token
+
     };
 
 };
@@ -69,17 +91,24 @@ exports.registerUser = async (data) => {
 
 
 
+
+
+
 // Login user
-exports.loginUser = async (email,password)=>{
+
+exports.loginUser = async(email,password)=>{
 
 
     const user =
         await User.findOne({email});
 
 
+
     if(!user){
 
-        throw new Error("User not found");
+        throw new Error(
+            "User not found"
+        );
 
     }
 
@@ -87,15 +116,20 @@ exports.loginUser = async (email,password)=>{
 
     const match =
         await bcrypt.compare(
+
             password,
+
             user.password
+
         );
 
 
 
     if(!match){
 
-        throw new Error("Wrong password");
+        throw new Error(
+            "Wrong password"
+        );
 
     }
 
@@ -105,21 +139,31 @@ exports.loginUser = async (email,password)=>{
         jwt.sign(
 
             {
-                id:user._id
+
+                id:user._id,
+
+                role:user.role
+
             },
 
             process.env.JWT_SECRET,
 
             {
+
                 expiresIn:"7d"
+
             }
 
         );
 
 
+
     return {
+
         user,
+
         token
+
     };
 
 

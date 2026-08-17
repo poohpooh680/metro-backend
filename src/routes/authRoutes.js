@@ -11,8 +11,12 @@ const {
 
 const validate = require("../middleware/validate");
 
+const rateLimiter = require("../middleware/rateLimiter");
+
+
 const {
-  registerValidation
+  registerValidation,
+  loginValidation
 } = require("../validators/authValidator");
 
 
@@ -21,16 +25,16 @@ const {
  * @swagger
  * tags:
  *   name: Auth
- *   description: User authentication
+ *   description: Admin authentication
  */
 
 
 
 /**
  * @swagger
- * /api/auth/register:
+ * /api/v1/auth/register:
  *   post:
- *     summary: Register a new user
+ *     summary: Register a new admin
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -45,16 +49,16 @@ const {
  *             properties:
  *               name:
  *                 type: string
- *                 example: Ahmed
+ *                 example: Admin
  *               email:
  *                 type: string
- *                 example: test@test.com
+ *                 example: admin@test.com
  *               password:
  *                 type: string
  *                 example: 123456
  *     responses:
  *       201:
- *         description: User created
+ *         description: Admin created
  *       400:
  *         description: Validation error
  */
@@ -72,9 +76,9 @@ router.post(
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/v1/auth/login:
  *   post:
- *     summary: Login user
+ *     summary: Login admin
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -88,7 +92,7 @@ router.post(
  *             properties:
  *               email:
  *                 type: string
- *                 example: test@test.com
+ *                 example: admin@test.com
  *               password:
  *                 type: string
  *                 example: 123456
@@ -96,11 +100,18 @@ router.post(
  *       200:
  *         description: Login successful
  *       400:
- *         description: Wrong credentials
+ *         description: Invalid input
+ *       401:
+ *         description: Invalid credentials
+ *       429:
+ *         description: Too many login attempts
  */
 
 router.post(
   "/login",
+  rateLimiter,
+  loginValidation,
+  validate,
   login
 );
 

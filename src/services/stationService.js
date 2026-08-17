@@ -7,7 +7,11 @@ exports.getAllStations = async()=>{
 
     return await Station.find()
     .sort({
+
+        line:1,
+
         order:1
+
     });
 
 };

@@ -5,17 +5,34 @@ const { getIO } = require("../sockets/socket");
 
 
 
-// GET ALL ANNOUNCEMENTS
+// GET ANNOUNCEMENTS
 
 exports.getAnnouncements = async(req,res,next)=>{
 
     try{
 
+
         const announcements =
-        await announcementService.getAnnouncements();
+        await announcementService.getAnnouncements({
+
+            station: req.query.station,
+
+            page: req.query.page,
+
+            limit: req.query.limit,
+
+            type: req.query.type,
+
+            startDate: req.query.startDate,
+
+            endDate: req.query.endDate
+
+        });
 
 
-        res.json(announcements);
+
+        res.status(200).json(announcements);
+
 
 
     }catch(error){
@@ -38,10 +55,12 @@ exports.getAnnouncement = async(req,res,next)=>{
 
     try{
 
+
         const announcement =
         await announcementService.getAnnouncement(
             req.params.id
         );
+
 
 
         if(!announcement){
@@ -55,7 +74,8 @@ exports.getAnnouncement = async(req,res,next)=>{
         }
 
 
-        res.json(announcement);
+
+        res.status(200).json(announcement);
 
 
 
@@ -79,6 +99,7 @@ exports.createAnnouncement = async(req,res,next)=>{
 
     try{
 
+
         const data = {
 
             title:req.body.title,
@@ -87,11 +108,10 @@ exports.createAnnouncement = async(req,res,next)=>{
 
             station:req.body.station,
 
-            createdBy:req.user
-            ? req.user.id
-            : null
+            createdBy:req.user.id
 
         };
+
 
 
         const announcement =
@@ -104,9 +124,12 @@ exports.createAnnouncement = async(req,res,next)=>{
         const io = getIO();
 
 
+
         if(io){
 
-            io.emit(
+            io.to(
+                req.body.station
+            ).emit(
                 "newAnnouncement",
                 announcement
             );
@@ -140,6 +163,7 @@ exports.updateAnnouncement = async(req,res,next)=>{
 
     try{
 
+
         const announcement =
         await announcementService.updateAnnouncement(
 
@@ -150,12 +174,28 @@ exports.updateAnnouncement = async(req,res,next)=>{
         );
 
 
+
+        if(!announcement){
+
+            return res.status(404).json({
+
+                message:"Announcement not found"
+
+            });
+
+        }
+
+
+
         const io = getIO();
+
 
 
         if(io){
 
-            io.emit(
+            io.to(
+                announcement.station.toString()
+            ).emit(
                 "updatedAnnouncement",
                 announcement
             );
@@ -164,7 +204,7 @@ exports.updateAnnouncement = async(req,res,next)=>{
 
 
 
-        res.json(announcement);
+        res.status(200).json(announcement);
 
 
 
@@ -189,28 +229,46 @@ exports.deleteAnnouncement = async(req,res,next)=>{
 
     try{
 
+
+        const announcement =
         await announcementService.deleteAnnouncement(
+
             req.params.id
+
         );
+
+
+
+        if(!announcement){
+
+            return res.status(404).json({
+
+                message:"Announcement not found"
+
+            });
+
+        }
+
 
 
         const io = getIO();
 
 
+
         if(io){
 
-            io.emit(
+            io.to(
+                announcement.station.toString()
+            ).emit(
                 "deletedAnnouncement",
-                {
-                    id:req.params.id
-                }
+                announcement
             );
 
         }
 
 
 
-        res.json({
+        res.status(200).json({
 
             message:"Announcement deleted"
 

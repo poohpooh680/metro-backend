@@ -1,37 +1,92 @@
-const jwt=require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 
-module.exports=(req,res,next)=>{
 
-const token=req.headers.authorization;
-
-
-if(!token){
-return res.status(401).json({
-message:"No token"
-});
-}
+module.exports = (req, res, next) => {
 
 
-try{
-
-const decoded=jwt.verify(
-token.split(" ")[1],
-process.env.JWT_SECRET
-);
+    const authHeader = req.headers.authorization;
 
 
-req.user=decoded;
 
-next();
+    if (!authHeader) {
+
+        return res.status(401).json({
+
+            message: "Authorization token required"
+
+        });
+
+    }
 
 
-}catch(error){
 
-res.status(401).json({
-message:"Invalid token"
-});
+    const parts = authHeader.split(" ");
 
-}
+
+
+    if (
+        parts.length !== 2 ||
+        parts[0] !== "Bearer"
+    ) {
+
+        return res.status(401).json({
+
+            message: "Invalid token format"
+
+        });
+
+    }
+
+
+
+    const token = parts[1];
+
+
+
+    try {
+
+
+        const decoded = jwt.verify(
+
+            token,
+
+            process.env.JWT_SECRET
+
+        );
+
+
+
+        if (decoded.role !== "admin") {
+
+            return res.status(403).json({
+
+                message: "Admin access required"
+
+            });
+
+        }
+
+
+
+        req.user = decoded;
+
+
+
+        next();
+
+
+
+    } catch (error) {
+
+
+        return res.status(401).json({
+
+            message: "Invalid or expired token"
+
+        });
+
+
+    }
 
 };

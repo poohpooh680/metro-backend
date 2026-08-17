@@ -10,25 +10,41 @@ const app = express();
 
 // Middleware
 app.use(cors());
+
 app.use(express.json());
 
 
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
+
 const stationRoutes = require("./routes/stationRoutes");
+
 const announcementRoutes = require("./routes/announcementRoutes");
+
 
 const errorHandler = require("./middleware/errorHandler");
 
 
 
 // API routes
-app.use("/api/auth", authRoutes);
 
-app.use("/api/stations", stationRoutes);
+app.use(
+    "/api/v1/auth",
+    authRoutes
+);
 
-app.use("/api/announcements", announcementRoutes);
+
+app.use(
+    "/api/v1/stations",
+    stationRoutes
+);
+
+
+app.use(
+    "/api/v1/announcements",
+    announcementRoutes
+);
 
 
 
@@ -42,20 +58,42 @@ app.use(
 
 
 
+// Health check (required by rubric)
+
+app.get(
+    "/health",
+    (req,res)=>{
+
+        res.json({
+
+            status:"ok"
+
+        });
+
+    }
+);
+
+
+
 // Test route
-app.get("/", (req,res)=>{
 
-    res.json({
+app.get(
+    "/",
+    (req,res)=>{
 
-        message:"Metro API running"
+        res.json({
 
-    });
+            message:"Metro API running"
 
-});
+        });
+
+    }
+);
 
 
 
 // Error handler (must be last)
+
 app.use(errorHandler);
 
 

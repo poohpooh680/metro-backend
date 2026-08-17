@@ -1,48 +1,166 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Socket Test</title>
+
+    <title>MetroSync Socket Test</title>
+
 </head>
+
 
 <body>
 
-<h1>Socket.IO Test</h1>
+
+<h1>MetroSync Socket.IO Test</h1>
+
 
 <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
 
+
 <script>
+
 
 const socket = io("http://localhost:5000");
 
 
-socket.on("connect",()=>{
+
+// Station to join
+
+const stationId = "6a82face789ecc91d7c68128";
+
+
+
+
+
+// Connection + join room
+
+socket.on("connect", () => {
+
 
     console.log(
         "Connected:",
         socket.id
     );
 
-});
 
-
-socket.on("newAnnouncement",(data)=>{
-
-    console.log(
-        "New announcement:",
-        data
+    socket.emit(
+        "joinStation",
+        stationId
     );
 
+
+    console.log(
+        "Joined station:",
+        stationId
+    );
+
+
 });
 
-socket.on("updatedAnnouncement",(data)=>{
-    console.log("Updated announcement:", data);
-});
 
 
-socket.on("deletedAnnouncement",(data)=>{
-    console.log("Deleted announcement:", data);
-});
+
+
+// Viewer count update
+
+socket.on(
+    "presenceUpdate",
+    (data) => {
+
+
+        console.log(
+            "Viewer update:",
+            data
+        );
+
+
+    }
+);
+
+
+
+
+
+// New announcement
+
+socket.on(
+    "newAnnouncement",
+    (data) => {
+
+
+        console.log(
+            "New announcement:",
+            data
+        );
+
+
+    }
+);
+
+
+
+
+
+// Updated announcement
+
+socket.on(
+    "updatedAnnouncement",
+    (data) => {
+
+
+        console.log(
+            "Updated announcement:",
+            data
+        );
+
+
+    }
+);
+
+
+
+
+
+// Deleted announcement
+
+socket.on(
+    "deletedAnnouncement",
+    (data) => {
+
+
+        console.log(
+            "Deleted announcement:",
+            data
+        );
+
+
+    }
+);
+
+
+
+
+
+// Connection error
+
+socket.on(
+    "connect_error",
+    (error) => {
+
+
+        console.log(
+            "Connection error:",
+            error.message
+        );
+
+
+    }
+);
+
+
 </script>
 
+
 </body>
+
 </html>
